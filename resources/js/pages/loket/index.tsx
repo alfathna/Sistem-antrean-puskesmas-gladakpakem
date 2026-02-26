@@ -1,5 +1,6 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { cloneElement, useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import {
     Megaphone, SkipForward, UserPlus, Search, ChevronDown,
     CheckCircle2, Clock, Users, Star, AlertCircle,
@@ -52,8 +53,12 @@ export default function LoketPage() {
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
 
     useEffect(() => {
-        if (flash?.success) { setNotification({ type: 'success', msg: flash.success }); setTimeout(() => setNotification(null), 4000); }
-        if (flash?.error) { setNotification({ type: 'error', msg: flash.error }); setTimeout(() => setNotification(null), 4000); }
+        if (flash?.success) {
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: flash.success, confirmButtonColor: '#0d9488', timer: 3000, timerProgressBar: true });
+        }
+        if (flash?.error) {
+            Swal.fire({ icon: 'error', title: 'Gagal!', text: flash.error, confirmButtonColor: '#0d9488' });
+        }
     }, [flash]);
 
     useEffect(() => {
@@ -110,7 +115,10 @@ export default function LoketPage() {
                 setFormData({ nik: '', name: '', birth_date: '', birth_place: '', gender: 'L', address: '', rt_rw: '', kelurahan: '', kecamatan: '', kabupaten: 'Jember', phone: '', blood_type: '', marital_status: '', occupation: '', allergy: '', bpjs_number: '' });
                 setLoading(false);
             },
-            onError: () => setLoading(false),
+            onError: () => {
+                setLoading(false);
+                Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Terjadi kesalahan saat mendaftarkan pasien.', confirmButtonColor: '#0d9488' });
+            },
         });
     };
 
@@ -452,13 +460,13 @@ function Section({ icon, title, children, className = '' }: { icon: React.ReactN
     );
 }
 
-function FI({ icon, label, value, onChange, type = 'text', placeholder = '', disabled = false }: { icon: React.ReactElement; label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; disabled?: boolean }) {
+function FI({ icon, label, value, onChange, type = 'text', placeholder = '', disabled = false }: { icon: React.ReactNode; label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; disabled?: boolean }) {
     return (
         <div>
             <label className="text-[10px] text-slate-500 font-medium block mb-1 uppercase tracking-wider">{label}</label>
             <div className="relative">
-                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    {<icon.type {...icon.props} className="w-3.5 h-3.5" />}
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 [&>svg]:w-3.5 [&>svg]:h-3.5">
+                    {icon}
                 </div>
                 <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} disabled={disabled}
                     className="w-full border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-sm disabled:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all" />
@@ -467,11 +475,11 @@ function FI({ icon, label, value, onChange, type = 'text', placeholder = '', dis
     );
 }
 
-function IR({ icon, label, value }: { icon: React.ReactElement; label: string; value: string }) {
+function IR({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
     return (
         <div className="flex items-center justify-between py-1">
-            <div className="flex items-center gap-1.5 text-slate-400">
-                {<icon.type {...icon.props} className="w-3 h-3" />}
+            <div className="flex items-center gap-1.5 text-slate-400 [&>svg]:w-3 [&>svg]:h-3">
+                {icon}
                 <span className="text-xs">{label}</span>
             </div>
             <span className="font-medium text-slate-700 text-xs">{value}</span>
